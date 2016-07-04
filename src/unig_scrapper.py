@@ -1,8 +1,8 @@
 import requests
 from lxml import html
 
-USERNAME = "140119121"
-PASSWORD = "55006"
+USERNAME = "12345678" #Eight numbers account
+PASSWORD = "12345" #Five numbers password
 
 LOGIN_URL = "http://lancamento.unig.br/unigonline/cadastrados.jsp"
 NOTA_URL = "http://lancamento.unig.br/unigonline/NotaServlet.do"
