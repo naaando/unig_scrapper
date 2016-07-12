@@ -1,12 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-def savefile(obj):
-		#print ('Save(true)')
-		f = open('login_unig.html', 'w')
-		f.write(obj)
-		f.close
-
 def unig_scraper(USERNAME, PASSWORD, INFO):
 	#Unig's URLs
 	LOGIN_URL = "http://lancamento.unig.br/unigonline/cadastrados.jsp"
