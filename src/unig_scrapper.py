@@ -31,9 +31,7 @@ def parser(Data):
 	soup = BeautifulSoup(Data, 'html.parser')
 	tag = soup.get_text()
 	print("="*25,soup.title.text,"="*25)
-	savefile(soup.prettify())
-
-	print()
+	
 	#Data = [Linha][Valor]
 	values = []
 	a = 0
