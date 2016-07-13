@@ -27,24 +27,32 @@ def unig_scraper(USERNAME, PASSWORD, INFO):
 	if INFO == 'nota' and NotaServlet.status_code == 200:
 		return NotaServlet.text
 
-def parser(Data):
+def parser(Data,argument):
 	soup = BeautifulSoup(Data, 'html.parser')
 	tag = soup.get_text()
-	print("="*25,soup.title.text,"="*25)
-	
-	#Data = [Linha][Valor]
+
+	#Procurando os valores nas tabelas
 	values = []
-	a = 0
 
 	rows = soup.find_all('tr')
 	for i in rows:
 		rowsp = i.find_all('td')
 		for i in rowsp:
 			values.append(i.text)
-	return values
+
+	#Procurando o nome no arquivo
+	rows = soup.find_all('font', 'texto')
+	nome = rows[0].text
+
+	switcher = {
+	0: soup.title.text,
+	1: values,
+	2: nome
+	}
+
+	return switcher.get(argument)
 
 def PrintNota(ParsedD):
-	#Assigning data to right place
 	class AnoLetivo:
 		def __init__(self):
 			self.AnoLetivo = []
@@ -68,9 +76,9 @@ def PrintNota(ParsedD):
 				ALFix[i] = ALFix[i].strip()
 
 			self.AnoLetivo = " ".join(ALFix)
-			#Space between strings
+			#Espaço entre as strings
 			s = 3
-			print(self.AnoLetivo,"Quantidade de materias: ",self.matnum)
+			print(self.AnoLetivo,"Quantidade de materias: ".rjust(56),self.matnum)
 			for i in range(self.matnum):
 				print(self.cod[i],
 				self.mat[i].ljust(35),
@@ -93,7 +101,6 @@ def PrintNota(ParsedD):
 				if i == Cod:
 					return True
 
-
 	AnoLet = []
 	x = -1
 
@@ -101,12 +108,8 @@ def PrintNota(ParsedD):
 		if (ParsedD[i].strip().find("Letivo")) > 0:
 			x=x+1
 			AnoLet.append(AnoLetivo())
-			#print(len(AnoLet))
 			AnoLet[x].AnoLetivo = ParsedD[i]
-			#print ('Valor de x = ', x)
 		if ParsedD[i].isnumeric() and len(ParsedD[i]) == 4 and not AnoLet[x].duplicated(ParsedD[i]):
-			#print('Codigo de matricula encontrado')
-			#print("Materia ",ParsedD[i+1]," em x: ", x)
 			AnoLet[x].matnum = AnoLet[x].matnum+1
 			AnoLet[x].cod.append(ParsedD[i])
 			AnoLet[x].mat.append(ParsedD[i+1])
@@ -125,20 +128,24 @@ def PrintNota(ParsedD):
 		i.showNota()
 
 def main():
-	#Getting user's credential
-	#Account
+	#Recolhendo credenciais de usuario
+	#Conta
 	print("Ola, digite sua matricula:")
 	matricula = input()
 
-	#Password
+	#Senha
 	print("Digite sua senha:")
 	senha = input()
 
-	#Printing credentials for debug reasons
-	print("="*15,"Matricula:",matricula," | ","Nome:", "="*15)
-	print("Codigo |  Materia  | N1 | R1 | N2 | R2 | PF | PA | SC | % de falta | Situação")
+	#Baixando html
 	Nota = unig_scraper(matricula, senha, "nota")
-	Parsed = parser(Nota)
+	Parsed = parser(Nota,1)
+	nome = parser(Nota,2)
+
+	#Exibindo credenciais
+	print("="*8,"Matricula:",matricula," | ", nome.title(), "="*8)
+	print("Codigo |  Materia  | N1 | R1 | N2 | R2 | PF | PA | SC | % de falta | Situação")
+
 	PrintNota(Parsed)
 
 if __name__ == '__main__':
