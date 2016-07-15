@@ -2,20 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 
 class UnigScrapper:
-	#def __init__(self):
-		#Recolhendo credenciais de usuario
-
-		#Conta
-		#matricula = input()
-		#senha = input()
-
-		#Baixando html
-		#Nota = unig_scraper(matricula, senha, "nota")
-		#Parsed = parser(Nota,1)
-		#nome = parser(Nota,2)
-
-		#PrintNota(Parsed)
-
 	def login(USERNAME, PASSWORD, REQUEST):
 		#Unig's URLs
 		LOGIN_URL = "http://lancamento.unig.br/unigonline/cadastrados.jsp"
@@ -47,27 +33,28 @@ class UnigScrapper:
 		tag = soup.get_text()
 
 		#Procurando os valores nas tabelas
-		values = []
+		notas = []
 
 		rows = soup.find_all('tr')
 		for i in rows:
 			rowsp = i.find_all('td')
 			for i in rowsp:
-				values.append(i.text.strip())
+				notas.append(i.text.strip())
 
 		#Procurando o nome no arquivo
 		rows = soup.find_all('font', 'texto')
 		nome = rows[0].text
 
+		#0:Titulo , 1: Lista de notas, 2: Nome do aluno
 		switcher = {
 		0: soup.title.text,
-		1: values,
-		2: nome
+		1: notas,
+		2: nome,
 		}
 
 		return switcher.get(argument)
 
-	def Notas(ParsedData):
+	def data_arrange(ParsedData):
 		class AnoLetivo:
 			def __init__(self):
 				self.AnoLetivo = []
@@ -77,7 +64,6 @@ class UnigScrapper:
 				self.n1 = []
 				self.r1 = []
 				self.n2 = []
-				self.r2 = []
 				self.r2 = []
 				self.pf = []
 				self.pa = []
