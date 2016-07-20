@@ -16,6 +16,7 @@ class UnigClient(tk.Tk):
 		self.geometry('700x400')
 		self.theme=ttk.Style()
 		self.theme.theme_use('clam')
+		self.theme.configure(self, background='#F0F0F0')
 		self.theme.configure("TButton", relief='flat' ,padding=10)
 		self.theme.configure("N.TButton", background='#6E0E00')
 		self.theme.configure("P.TButton", background='#0C7E00')
