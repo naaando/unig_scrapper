@@ -4,6 +4,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+import os
 import unig_scrapper
 
 LARGE_FONT= ("Liberation Sans", 24)
@@ -15,7 +16,8 @@ class UnigClient(tk.Tk):
 		tk.Tk.__init__(self,*args,**kwargs)
 		self.geometry('700x400')
 		self.theme=ttk.Style()
-		self.theme.theme_use('clam')
+		if os.name != 'nt':
+    		self.theme.theme_use('clam')
 		self.theme.configure(self, relief='flat', background='#F0F0F0')
 		self.theme.configure("TButton", relief='flat' ,padding=10)
 		self.theme.configure("N.TButton", background='#6E0E00')
