@@ -5,9 +5,11 @@
 import tkinter as tk
 from tkinter import ttk
 import os
+import json
 import unig_scrapper
 
 LARGE_FONT= ("Liberation Sans", 24)
+bgcolor = '#F0F0F0'
 
 Unig = unig_scrapper.UnigScrapper
 
@@ -18,18 +20,22 @@ class UnigClient(tk.Tk):
 		self.theme=ttk.Style()
 		if os.name != 'nt':
 			self.theme.theme_use('clam')
-		self.theme.configure(self, relief='flat', background='#F0F0F0')
-		self.theme.configure("TButton", relief='flat' ,padding=10)
-		self.theme.configure("N.TButton", background='#6E0E00')
-		self.theme.configure("P.TButton", background='#0C7E00')
-		self.theme.map("P.TButton",
-			foreground=[('pressed', '#white'), ('active', 'white')],
-			background=[('pressed', '#0B6E00'), ('active', '#15D100')]
-    		)
-		self.theme.map("N.TButton",
-			foreground=[('pressed', '#white'), ('active', 'white')],
-			background=[('pressed', '#981400'), ('active', '#D81C00')]
-    		)
+			self.theme.configure(self, relief='flat', background=bgcolor)
+			self.theme.configure("TButton", relief='flat' ,padding=10)
+			self.theme.configure("N.TButton", background='#6E0E00')
+			self.theme.configure("P.TButton", background='#0C7E00')
+			self.theme.map("P.TButton",
+				foreground=[('pressed', '#white'), ('active', 'white')],
+				background=[('pressed', '#0B6E00'), ('active', '#15D100')]
+	    		)
+			self.theme.map("N.TButton",
+				foreground=[('pressed', '#white'), ('active', 'white')],
+				background=[('pressed', '#981400'), ('active', '#D81C00')]
+	    		)
+		else:
+			self.theme.configure("TButton", padding=10)
+			self.theme.configure("N.TButton")
+			self.theme.configure("P.TButton")
 
 		#Icon e titulo, resolver depois
 		#tk.Tk.iconbitmap(self,default="unig.ico")
@@ -70,16 +76,19 @@ class UnigClient(tk.Tk):
 		frame.grid(row=0,column=0,sticky='nsew')
 
 	def Exit(self):
-		pass
-		#self.destroy()
+		self.destroy()
 
 class LoginPage(tk.Frame):
 	def __init__(self, parent, controller, data=0):
-		tk.Frame.__init__(self, parent)
+		tk.Frame.__init__(self, parent, bg=bgcolor)
 		label = ttk.Label(self, text="Unig Login", font=LARGE_FONT)
-		label.pack(pady=10,padx=10,side='top')
+		label.pack(pady=50,padx=10,side='top')
 
+		#Variaveis
 		self.Html=None
+		self.controller = controller
+
+		#Containers
 		mat_cont = ttk.Frame(self)
 		mat_cont.pack(pady=10,padx=10,side='top')
 		sen_cont = ttk.Frame(self)
@@ -99,40 +108,49 @@ class LoginPage(tk.Frame):
 		self.password=ttk.Entry(sen_cont, show="*")
 		self.password.pack(side='left')
 
+		self.rm = tk.IntVar()
+		remember = ttk.Checkbutton(self.login_form, text='Lembrar-Me', variable=self.rm)
+		remember.pack(side='top')
+
 		#Botoes
-		self.controller = controller
 		login = ttk.Button(self.login_form, text="Entrar", command=self.login, style="P.TButton")
 		login.pack(side='left',pady=10,padx=10)
 
-		exit = ttk.Button(self.login_form, text="Fechar", command=self.controller.Exit(), style='N.TButton')
+		exit = ttk.Button(self.login_form, text="Fechar", command=self.controller.Exit, style='N.TButton')
 		exit.pack(side='left',pady=10,padx=10)
 
 	def login(self):
 		print("Matricula : ",self.username.get())
 		print("Senha : ",self.password.get())
 		print("Efetuando login")
-		self.Html = Unig.login(self.username.get(), self.password.get(), "nota")
-		MainPage.parser(MainPage,self.Html)
-		self.controller.load_page(MainPage)
-		self.controller.show_frame(MainPage)
+		#self.Html = Unig.login(self.username.get(), self.password.get(), "nota")
+		#MainPage.parser(MainPage,self.Html)
+		if self.rm.get() == 1:
+			print('Salvando credenciais')
+			self.remember_me()
+		#self.controller.load_page(MainPage)
+		#self.controller.show_frame(MainPage)
 
 	def login_response(self):
 		print("Requisitando html")
 		return Html
 
 	def remember_me(self):
-		pass
+		with open('credentials', 'w') as outfile:
+			data = {'username': self.username.get(), 'password': self.password.get()}
+			print(data)
+			json.dump(data, outfile)
 
 class MainPage(tk.Frame):
 	def __init__(self, parent, controller,data=0):
-		tk.Frame.__init__(self,parent)
+		tk.Frame.__init__(self,parent,bg=bgcolor)
 
 		label = ttk.Label(self, text="Consulta de notas", font=LARGE_FONT)
 		label.pack(pady=10,padx=10)
 
 		na = self.nota_arrange[1]
 
-		header = [self.nome, na.AnoLetivo,"Quantidade de materias: ",na.matnum]
+		header = self.nome+na.AnoLetivo+"Quantidade de materias: "+str(na.matnum)
 		name = ttk.Label(self, text=header)
 		name.pack()
 
@@ -154,8 +172,6 @@ class MainPage(tk.Frame):
 		LogoutButton = ttk.Button(self, text="Sair", style='N.TButton',command=lambda: controller.show_frame(LoginPage))
 		LogoutButton.pack(pady=10,padx=10)
 
-		#self.buildtree()
-
 	def parser(self,html):
 		print(html)
 		print("Fazendo parsing do documento....")
@@ -168,18 +184,6 @@ class MainPage(tk.Frame):
 
 		if html != None:
 			return True
-
-	# 	#Notas.insert('','end',values=self.nota_arrange[0])
-	# 	#for item in self.element_list:
-    #     #     self.tree.insert('', 'end', values=item)
-    #     #     # adjust column's width if necessary to fit each value
-    #     #     for ix, val in enumerate(item):
-    #     #     	col_w = tkFont.Font().measure(val)
-    #     #         if self.tree.column(self.element_header[ix], width=None) < col_w:
-    #     #             self.tree.column(self.element_header[ix], width=col_w)
-	#
-	# 	namse = ttk.Label(self, text="data")
-	# 	namse.pack()
 
 
 app = UnigClient()
