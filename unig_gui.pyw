@@ -6,15 +6,27 @@ import tkinter as tk
 from tkinter import ttk
 import unig_scrapper
 
-LARGE_FONT= ("Arimo", 24)
+LARGE_FONT= ("Liberation Sans", 24)
 
 Unig = unig_scrapper.UnigScrapper
 
 class UnigClient(tk.Tk):
 	def __init__(self,*args,**kwargs):
 		tk.Tk.__init__(self,*args,**kwargs)
-		#self.theme=ttk.Style()
-		#self.theme.theme_use('clam')
+		self.geometry('700x400')
+		self.theme=ttk.Style()
+		self.theme.theme_use('clam')
+		self.theme.configure("TButton", relief='flat' ,padding=10)
+		self.theme.configure("N.TButton", background='#6E0E00')
+		self.theme.configure("P.TButton", background='#0C7E00')
+		self.theme.map("P.TButton",
+			foreground=[('pressed', '#white'), ('active', 'white')],
+			background=[('pressed', '#0B6E00'), ('active', '#15D100')]
+    		)
+		self.theme.map("N.TButton",
+			foreground=[('pressed', '#white'), ('active', 'white')],
+			background=[('pressed', '#981400'), ('active', '#D81C00')]
+    		)
 
 		#Icon e titulo, resolver depois
 		#tk.Tk.iconbitmap(self,default="unig.ico")
@@ -22,7 +34,7 @@ class UnigClient(tk.Tk):
 
 		self.container = tk.Frame(self)
 
-		self.container.pack(side="top", fill="both", expand=True)
+		self.container.pack(fill="both", expand=True)
 
 		self.container.grid_rowconfigure(0, weight=1)
 		self.container.grid_columnconfigure(0, weight=1)
@@ -62,25 +74,35 @@ class LoginPage(tk.Frame):
 	def __init__(self, parent, controller, data=0):
 		tk.Frame.__init__(self, parent)
 		label = ttk.Label(self, text="Unig Login", font=LARGE_FONT)
-		label.pack(pady=10,padx=10)
+		label.pack(pady=10,padx=10,side='top')
 
 		self.Html=None
-
-		self.username=ttk.Entry(self)
-		self.username.pack(pady=2)
-
-		self.password=ttk.Entry(self, show="*")
-		self.password.pack(pady=2)
-
+		mat_cont = ttk.Frame(self)
+		mat_cont.pack(pady=10,padx=10,side='top')
+		sen_cont = ttk.Frame(self)
+		sen_cont.pack(pady=10,padx=10,side='top')
 		self.login_form=ttk.Frame(self)
-		self.login_form.pack()
+		self.login_form.pack(pady=10,padx=10,side='bottom')
 
+		#Label e entry da matricula
+		matricula = ttk.Label(mat_cont, text="Matricula : ")
+		matricula.pack(side='left')
+		self.username=ttk.Entry(mat_cont)
+		self.username.pack(side='left')
+
+		#Label e entry da senha
+		senha = ttk.Label(sen_cont, text="Senha : ")
+		senha.pack(side='left')
+		self.password=ttk.Entry(sen_cont, show="*")
+		self.password.pack(side='left')
+
+		#Botoes
 		self.controller = controller
-		login = ttk.Button(self.login_form, text="Entrar", command=self.login)
-		login.pack(pady=10,padx=10)
+		login = ttk.Button(self.login_form, text="Entrar", command=self.login, style="P.TButton")
+		login.pack(side='left',pady=10,padx=10)
 
-		exit = ttk.Button(self.login_form, text="Fechar", command=self.controller.Exit())
-		exit.pack(pady=10,padx=10)
+		exit = ttk.Button(self.login_form, text="Fechar", command=self.controller.Exit(), style='N.TButton')
+		exit.pack(side='left',pady=10,padx=10)
 
 	def login(self):
 		print("Matricula : ",self.username.get())
@@ -94,6 +116,9 @@ class LoginPage(tk.Frame):
 	def login_response(self):
 		print("Requisitando html")
 		return Html
+
+	def remember_me(self):
+		pass
 
 class MainPage(tk.Frame):
 	def __init__(self, parent, controller,data=0):
@@ -123,7 +148,7 @@ class MainPage(tk.Frame):
 
 		self.Notas.pack()
 
-		LogoutButton = ttk.Button(self, text="Sair",command=lambda: controller.show_frame(LoginPage))
+		LogoutButton = ttk.Button(self, text="Sair", style='N.TButton',command=lambda: controller.show_frame(LoginPage))
 		LogoutButton.pack(pady=10,padx=10)
 
 		#self.buildtree()
