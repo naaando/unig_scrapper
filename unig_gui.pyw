@@ -8,7 +8,10 @@ import os
 import json
 import unig_scrapper
 
-LARGE_FONT= ("Liberation Sans", 24)
+if os.name == 'nt':
+	LARGE_FONT= ("Arimo", 24)
+else:
+	LARGE_FONT= ("Liberation Sans", 24)
 bgcolor = '#F0F0F0'
 VERSAO= '0.2 beta'
 
@@ -21,7 +24,6 @@ class UnigClient(tk.Tk):
 		self.theme=ttk.Style()
 		if os.name != 'nt':
 			self.theme.theme_use('clam')
-			self.theme.configure(self, relief='flat', background=bgcolor)
 			self.theme.configure("TButton", relief='flat' ,padding=10)
 			self.theme.configure("N.TButton", background='#6E0E00')
 			self.theme.configure("P.TButton", background='#0C7E00')
@@ -37,6 +39,7 @@ class UnigClient(tk.Tk):
 			self.theme.configure("TButton", padding=10)
 			self.theme.configure("N.TButton")
 			self.theme.configure("P.TButton")
+		self.theme.configure(self, background=bgcolor)
 
 		#Icon e titulo, resolver depois
 		#tk.Tk.iconbitmap(self,default="unig.ico")
