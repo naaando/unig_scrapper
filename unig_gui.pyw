@@ -10,6 +10,7 @@ import unig_scrapper
 
 LARGE_FONT= ("Liberation Sans", 24)
 bgcolor = '#F0F0F0'
+VERSAO= '0.2 beta'
 
 Unig = unig_scrapper.UnigScrapper
 
@@ -39,7 +40,7 @@ class UnigClient(tk.Tk):
 
 		#Icon e titulo, resolver depois
 		#tk.Tk.iconbitmap(self,default="unig.ico")
-		tk.Tk.wm_title(self, "Notas - Unig")
+		tk.Tk.wm_title(self, "Unig - Consulta de notas")
 
 		self.container = tk.Frame(self)
 
@@ -49,12 +50,6 @@ class UnigClient(tk.Tk):
 		self.container.grid_columnconfigure(0, weight=1)
 
 		self.frames = {}
-
-		# for F in (LoginPage,MainPage):
-		# 	print(F)
-		# 	frame = F(container, self)
-		# 	self.frames[F] = frame
-		# 	frame.grid(row=0, column=0, sticky="nsew")
 
 		print(LoginPage)
 		frame = LoginPage(self.container,self)
@@ -81,20 +76,24 @@ class UnigClient(tk.Tk):
 class LoginPage(tk.Frame):
 	def __init__(self, parent, controller, data=0):
 		tk.Frame.__init__(self, parent, bg=bgcolor)
-		label = ttk.Label(self, text="Unig Login", font=LARGE_FONT)
-		label.pack(pady=50,padx=10,side='top')
 
 		#Variaveis
 		self.Html=None
 		self.controller = controller
 
 		#Containers
+		label_cont = ttk.Frame(self)
+		label_cont.pack()
 		mat_cont = ttk.Frame(self)
 		mat_cont.pack(pady=10,padx=10,side='top')
 		sen_cont = ttk.Frame(self)
 		sen_cont.pack(pady=10,padx=10,side='top')
 		self.login_form=ttk.Frame(self)
 		self.login_form.pack(pady=10,padx=10,side='bottom')
+
+		#label principal e versao
+		versao = ttk.Label(label_cont, text='Versão '+VERSAO).pack()
+		label = ttk.Label(label_cont, text="Unig Login", font=LARGE_FONT).pack(pady=50,padx=10,side='top')
 
 		#Label e entry da matricula
 		matricula = ttk.Label(mat_cont, text="Matricula : ")
@@ -109,7 +108,8 @@ class LoginPage(tk.Frame):
 		self.password.pack(side='left')
 
 		self.rm = tk.IntVar()
-		remember = ttk.Checkbutton(self.login_form, text='Lembrar-Me', variable=self.rm)
+		remember = ttk.Checkbutton(self.login_form, text='Lembrar-Me(Em breve)', variable=self.rm)
+		remember.state(["disabled"])
 		remember.pack(side='top')
 
 		#Botoes
@@ -123,13 +123,13 @@ class LoginPage(tk.Frame):
 		print("Matricula : ",self.username.get())
 		print("Senha : ",self.password.get())
 		print("Efetuando login")
-		#self.Html = Unig.login(self.username.get(), self.password.get(), "nota")
-		#MainPage.parser(MainPage,self.Html)
+		self.Html = Unig.login(self.username.get(), self.password.get(), "nota")
+		MainPage.parser(MainPage,self.Html)
 		if self.rm.get() == 1:
 			print('Salvando credenciais')
 			self.remember_me()
-		#self.controller.load_page(MainPage)
-		#self.controller.show_frame(MainPage)
+		self.controller.load_page(MainPage)
+		self.controller.show_frame(MainPage)
 
 	def login_response(self):
 		print("Requisitando html")
@@ -150,8 +150,8 @@ class MainPage(tk.Frame):
 
 		na = self.nota_arrange[1]
 
-		header = self.nome+na.AnoLetivo+"Quantidade de materias: "+str(na.matnum)
-		name = ttk.Label(self, text=header)
+		header = [self.nome,na.AnoLetivo,"Quantidade de materias:"+str(na.matnum)]
+		name = ttk.Label(self, text=' | '.join(header))
 		name.pack()
 
 		Notas_Columns = ['Codigo','Materia','Nota1','Nota2','Pr','Sc']
