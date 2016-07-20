@@ -13,7 +13,7 @@ if os.name == 'nt':
 else:
 	LARGE_FONT= ("Liberation Sans", 24)
 bgcolor = '#F0F0F0'
-VERSAO= '0.2 beta'
+VERSAO= '0.2'
 
 Unig = unig_scrapper.UnigScrapper
 
